@@ -1,111 +1,157 @@
-# Jithesh-s-Empathy-Engine 🎙️
+# Empathy Engine Demo
 
-## Overview
-The **Empathy Engine** is a Python-based project that transforms plain text into emotionally expressive speech. Unlike standard monotonic text-to-speech (TTS) systems, this engine detects the sentiment of the input text (Positive, Negative, Neutral) and dynamically modulates voice parameters like **rate**, **pitch**, and **volume** to sound more human-like.
-
-This project was built as part of a hackathon challenge with a time constraint of ~1.5 hours. The focus is on simplicity, clarity, and demonstrable functionality.
+🎙️ **Empathy Engine** is a local AI-powered web application that detects the emotional tone of a text input, generates a supportive response, and converts it into expressive speech. The web interface features an interactive bubble background for a visually engaging experience.
 
 ---
 
 ## Features
-- Accepts text input (via CLI or web interface).
-- Detects sentiment using **TextBlob**.
-- Maps emotions (Positive / Negative / Neutral) to vocal parameters.
-- Generates expressive speech output via **pyttsx3** (offline, no API keys required).
-- Outputs playable `.wav` or `.mp3` audio files.
-- Optional: Run as a **Flask web app** with a text box + audio player.
+
+* **Text Input:** Enter a short paragraph (3–5 sentences recommended) in the input box.
+* **Emotion Detection:** Detects the emotional tone (Positive, Negative, Neutral) using TextBlob.
+* **Audio Output:** Generates a local `.wav` file with expressive speech using pyttsx3.
+* **Interactive Web UI:** Engaging black-background interface with floating, clickable bubbles.
+* **Enhanced Buttons:**
+
+  * `Analyze & Speak` button (blue)
+  * `Clear` and `Replay` buttons (red)
+  * Download button styled to match the theme.
 
 ---
 
 ## Tech Stack
-- **Python 3.9+**
-- [TextBlob](https://textblob.readthedocs.io/en/dev/) → Sentiment analysis
-- [pyttsx3](https://pyttsx3.readthedocs.io/) → Offline text-to-speech
-- [Flask](https://flask.palletsprojects.com/) → Web UI (optional)
+
+* **Frontend:** HTML, CSS, JavaScript
+* **Backend:** Python, Flask
+* **Libraries:**
+
+  * `TextBlob` for sentiment/emotion detection
+  * `pyttsx3` for local text-to-speech
+* **Design:** Interactive bubble animation using CSS + JS
 
 ---
 
-## Installation
+## Setup Instructions
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/your-username/empathy-engine.git
-   cd empathy-engine
-   ```
+1. **Clone the repository**
 
-2. Create a virtual environment (recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # On Linux/Mac
-   venv\Scripts\activate    # On Windows
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Download TextBlob corpora (needed for sentiment analysis):
-   ```bash
-   python -m textblob.download_corpora
-   ```
-
----
-
-## Usage
-
-### CLI Mode (Quick Demo)
-Run:
-```bash
-python empathy_engine.py
+```
+git clone [https://github.com/Jithesh1464/EmpathyEngine](https://github.com/Jithesh1464/Jithesh-s-Empathy-Engine).git
+cd EmpathyEngine
 ```
 
-Enter text when prompted, and the system will:
-- Detect sentiment
-- Adjust speech parameters
-- Generate spoken output
+2. **Create a virtual environment (optional but recommended)**
 
-An audio file (`output.wav`) will also be saved.
+```
+python -m venv venv
+```
+
+Activate it:
+
+* **Windows:** `venv\Scripts\activate`
+* **Linux/Mac:** `source venv/bin/activate`
+
+3. **Install dependencies**
+
+```
+pip install -r requirements.txt
+```
+
+> If you don't have a `requirements.txt`, install manually:
+
+```
+pip install flask textblob pyttsx3
+python -m textblob.download_corpora
+```
 
 ---
 
-### Flask Web UI (Optional)
-To launch the web interface:
-```bash
-python empathy_engine.py --web
+## Running the Application
+
+1. **Start the Flask server**
+
+```
+python app.py
 ```
 
-- Open your browser at `http://127.0.0.1:5000/`
-- Enter text → Hear expressive voice output instantly.
+2. **Open your browser** and go to:
+
+```
+http://127.0.0.1:5000
+```
+
+3. **Use the interface:**
+
+   * Type or paste text in the input box.
+   * Click **Analyze & Speak** to detect emotion and generate speech.
+   * Replay or download the audio using the buttons.
 
 ---
 
-## Example Emotion-to-Voice Mapping
-- **Positive** → Faster rate, higher pitch, louder volume
-- **Negative** → Slower rate, lower pitch, softer volume
-- **Neutral** → Default values
+## Sample Input & Expected Output
+
+### Input 1:
+
+```
+I just got a promotion at work! I am so happy and excited about my future.
+```
+
+**Expected Output:**
+
+* **Emotion:** Positive
+* **Intensity:** High
+* **Response Text:** "That's fantastic! Congratulations on your well-deserved success!"
+* **Audio:** Plays a happy, enthusiastic voice reflecting the positive sentiment.
 
 ---
 
-## Folder Structure
+### Input 2:
+
 ```
-empathy-engine/
-│── empathy_engine.py       # Main script
-│── requirements.txt        # Dependencies
-│── README.md               # Documentation
-│── static/                 # (Optional) Web assets
-│── output.wav              # Generated audio
+I am frustrated with my project; nothing seems to be working as expected.
 ```
+
+**Expected Output:**
+
+* **Emotion:** Negative
+* **Intensity:** Medium
+* **Response Text:** "I understand your frustration. Take a deep breath, and let's try to find a solution together."
+* **Audio:** Plays a calm, empathetic voice reflecting concern.
+
+---
+
+### Input 3:
+
+```
+Today is an ordinary day, nothing special happened.
+```
+
+**Expected Output:**
+
+* **Emotion:** Neutral
+* **Intensity:** Low
+* **Response Text:** "Thanks for sharing. Let's see what interesting things might come next!"
+* **Audio:** Plays a neutral, calm voice.
+
+---
+
+## Notes
+
+* **All audio processing is local** — no API keys or external TTS services are required.
+* The **bubble animation and black background** create a visually immersive experience without affecting functionality.
+* Adjust the **text length** to get more accurate emotional detection and richer audio output.
 
 ---
 
 ## Future Improvements
-- Add more granular emotions (e.g., excited, calm, angry, surprised).
-- Scale intensity based on sentiment polarity score.
-- Integrate SSML for advanced vocal control.
-- Deploy as a hosted web demo.
+
+* Add more nuanced emotions (e.g., excited, surprised, concerned).
+* Use HuggingFace Transformers for advanced emotion detection.
+* Add **intensity scaling** to modulate pitch and speed based on emotional strength.
+* Integrate **SSML** for finer control over speech synthesis.
+* Make the application **fully responsive** on mobile devices.
 
 ---
 
-## License
-This project is for educational and hackathon purposes.
+## Author
+
+Developed by **\[Jithesh Kottu]** as part of the Empathy Engine project demo.
