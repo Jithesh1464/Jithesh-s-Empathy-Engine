@@ -35,7 +35,7 @@
 1. **Clone the repository**
 
 ```
-git clone [https://github.com/Jithesh1464/EmpathyEngine](https://github.com/Jithesh1464/Jithesh-s-Empathy-Engine).git
+git clone https://github.com/Jithesh1464/Jithesh-s-Empathy-Engine.git
 cd EmpathyEngine
 ```
 
@@ -144,14 +144,14 @@ Today is an ordinary day, nothing special happened.
 
 ## Future Improvements
 
-* Add more nuanced emotions (e.g., excited, surprised, concerned).
-* Use HuggingFace Transformers for advanced emotion detection.
-* Add **intensity scaling** to modulate pitch and speed based on emotional strength.
-* Integrate **SSML** for finer control over speech synthesis.
-* Make the application **fully responsive** on mobile devices.
+* Adding more nuanced emotions (e.g., excited, surprised, concerned).
+* Using HuggingFace Transformers for advanced emotion detection.
+* Adding **intensity scaling** to modulate pitch and speed based on emotional strength.
+* Integrating **SSML** for finer control over speech synthesis.
+* Making the application **fully responsive** on mobile devices.
 
 ---
 
 ## Author
 
-Developed by **\[Jithesh Kottu]** as part of the Empathy Engine project demo.
+Developed by **\Jithesh Kottu** as part of the Empathy Engine project demo for  Darwix AI Hackathon.
