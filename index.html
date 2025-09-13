@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Jithesh's Empathy Engine </title>
+
+  <style>
+    
+    .bubble {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      bottom: -60px;
+      opacity: 0;
+      cursor: pointer;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      animation: rise 6s ease-in-out forwards;
+    }
+    .bubble-inner {
+      width: 100%;
+      height: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      border-radius: 50%;
+      filter: blur(1px);
+      animation: wobble 3s ease-in-out infinite;
+    }
+    .bubble:hover { transform: scale(2); }
+    .bubble.burst { transform: scale(0); opacity: 0; animation: none; }
+    .bubble.burst .bubble-inner { animation: none; }
+
+    @keyframes rise {
+      0% { bottom: -60px; opacity: 0; }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% { bottom: calc(100% + 60px); opacity: 0; }
+    }
+    @keyframes wobble {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #000000;
+      overflow: hidden;
+      position: relative;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+    }
+    #bubbleContainer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+
+    .app {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .card {
+      background: rgba(20,20,20,0.85);
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 650px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0,200,255,0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #00e6ff;
+      text-shadow: 0 0 10px rgba(0,230,255,0.8);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #aaa;
+      margin-bottom: 1.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 1rem;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 1rem;
+      resize: none;
+    }
+    textarea::placeholder { color: #aaa; }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+   button {
+      flex: 1;
+      margin: 0 0.5rem;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #fff;
+      transition: all 0.3s ease;
+  }
+
+  #analyzeBtn {
+      background: linear-gradient(135deg, #00e6ff, #0077ff);
+      box-shadow: 0 0 15px rgba(0,230,255,0.5);
+  }
+  #analyzeBtn:hover {
+      background: linear-gradient(135deg, #00c6ff, #0057ff);
+      box-shadow: 0 0 25px rgba(0,230,255,0.8);
+  }
+
+  
+  #clearBtn, #replayBtn, #downloadLink {
+      background: linear-gradient(135deg, #ff3b3b, #c70000);
+      box-shadow: 0 0 15px rgba(255,50,50,0.5);
+      color: #fff;
+      text-decoration: none; 
+      display: inline-block; 
+      text-align: center;
+  }
+  #clearBtn:hover, #replayBtn:hover, #downloadLink:hover {
+      background: linear-gradient(135deg, #ff1a1a, #a00000);
+      box-shadow: 0 0 25px rgba(255,50,50,0.8);
+  }
+
+    #result {
+      margin-top: 2rem;
+      text-align: left;
+      color: #ddd;
+    }
+    .meta { margin-bottom: 1rem; font-size: 0.95rem; }
+    .reply {
+      background: rgba(255,255,255,0.05);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+    audio { width: 100%; margin-top: 1rem; border-radius: 10px; }
+    footer { margin-top: 2rem; font-size: 0.8rem; color: #666; }
+
+  </style>
+</head>
+<body>
+
+
+  <div id="bubbleContainer"></div>
+
+  <div class="app">
+    <div class="card">
+      <header>
+        <h1>🎙️ Jithesh's Empathy Engine</h1>
+        <p class="subtitle">Type a message, the system will detect emotion, generate a supportive reply, and produce expressive speech.</p>
+      </header>
+
+      <form id="analyzeForm">
+        <textarea id="user_input" name="user_input" placeholder="Type a short paragraph (3–5 sentences works well)"></textarea>
+        <div class="controls">
+          <button type="submit" id="analyzeBtn">Analyze & Speak</button>
+          <button type="button" id="clearBtn" class="muted">Clear</button>
+        </div>
+      </form>
+
+      <section id="result" class="hidden">
+        <div class="meta">
+          <div><strong>Emotion:</strong> <span id="emotionLabel"></span></div>
+          <div><strong>Intensity:</strong> <span id="intensityLabel"></span></div>
+        </div>
+
+        <div class="reply">
+          <p id="textResponse"></p>
+        </div>
+
+        <div class="audio-row">
+          <audio id="player" controls></audio>
+          <div style="margin-top:0.5rem;">
+            <button id="replayBtn">Replay</button>
+            <a id="downloadLink" href="#" download>Download</a>
+          </div>
+        </div>
+      </section>
+
+        <footer>Developed by Jithesh Kottu with ❤️ for Darwix AI Hackathon 2025</footer>
+    </div>
+  </div>
+
+  
+  <script>
+    const form = document.getElementById('analyzeForm');
+    const resultSec = document.getElementById('result');
+    const emotionLabel = document.getElementById('emotionLabel');
+    const intensityLabel = document.getElementById('intensityLabel');
+    const textResponse = document.getElementById('textResponse');
+    const player = document.getElementById('player');
+    const replayBtn = document.getElementById('replayBtn');
+    const downloadLink = document.getElementById('downloadLink');
+    const clearBtn = document.getElementById('clearBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.disabled = true;
+      analyzeBtn.innerText = 'Processing...';
+
+      const res = await fetch('/analyze', { method: 'POST', body: fd });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || 'Server error');
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerText = 'Analyze & Speak';
+        return;
+      }
+      const data = await res.json();
+
+      emotionLabel.innerText = data.emotion;
+      intensityLabel.innerText = data.intensity;
+      textResponse.innerText = data.text_response;
+
+      player.src = data.audio_url;
+      player.load();
+
+      downloadLink.href = data.audio_url;
+      downloadLink.setAttribute('download', `empathy_${data.emotion}.wav`);
+
+      resultSec.classList.remove('hidden');
+      player.play().catch(()=>{});
+
+      analyzeBtn.disabled = false;
+      analyzeBtn.innerText = 'Analyze & Speak';
+    });
+
+    replayBtn.addEventListener('click', () => {
+      if (player.src) { player.currentTime = 0; player.play(); }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      document.getElementById('user_input').value = '';
+      resultSec.classList.add('hidden');
+    });
+  </script>
+
+ 
+  <script>
+    const maxBubbles = 4;
+    let activeBubbles = 0;
+    const bubbleColors = [
+      { gradient: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.6), rgba(150,200,255,0.2) 40%, rgba(100,150,200,0.1))', shadow: '0 0 15px rgba(150,200,255,0.2), inset 0 0 5px rgba(255,255,255,0.3)' },
+      { gradient: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.45), rgba(200,150,255,0.12) 40%, rgba(150,100,200,0.07))', shadow: '0 0 15px rgba(200,150,255,0.2), inset 0 0 5px rgba(255,255,255,0.3)' },
+      { gradient: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.45), rgba(150,255,200,0.12) 40%, rgba(100,200,150,0.07))', shadow: '0 0 15px rgba(150,255,200,0.2), inset 0 0 5px rgba(255,255,255,0.3)' },
+      { gradient: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.45), rgba(255,150,200,0.12) 40%, rgba(200,100,150,0.07))', shadow: '0 0 15px rgba(255,150,200,0.2), inset 0 0 5px rgba(255,255,255,0.3)' }
+    ];
+
+    function createBubble() {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      const inner = document.createElement('div');
+      inner.className = 'bubble-inner';
+      bubble.appendChild(inner);
+
+      const windowWidth = window.innerWidth - 60;
+      let xPos = Math.random() < 0.5 ? Math.random()*(windowWidth*0.2) : (windowWidth*0.8)+Math.random()*(windowWidth*0.15);
+      bubble.style.left = `${xPos}px`;
+
+      const size = Math.random()*40+40;
+      bubble.style.width = size+'px';
+      bubble.style.height = size+'px';
+
+      const duration = Math.random()*4+6;
+      bubble.style.animationDuration = `${duration}s`;
+      inner.style.animationDuration = `${duration/2}s`;
+
+      const color = bubbleColors[Math.floor(Math.random()*bubbleColors.length)];
+      inner.style.background = color.gradient;
+      inner.style.boxShadow = color.shadow;
+
+      activeBubbles++;
+      document.getElementById('bubbleContainer').appendChild(bubble);
+
+      bubble.addEventListener('animationend', e=>{ if(e.animationName==='rise'&&!bubble.classList.contains('burst')) { bubble.remove(); activeBubbles--; } });
+      bubble.addEventListener('click', ()=>{ bubble.classList.add('burst'); });
+      bubble.addEventListener('transitionend', e=>{ if(e.propertyName==='transform' && bubble.classList.contains('burst')) { bubble.remove(); activeBubbles--; } }, {once:true});
+    }
+
+    function spawnBubbles() {
+      for(let i=0;i<maxBubbles;i++){ createBubble(); }
+      setInterval(()=>{ createBubble(); }, 500);
+    }
+
+    window.onload = spawnBubbles;
+  </script>
+
+</body>
+</html>
